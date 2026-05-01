@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
+    <title>地摊库存本 · 假睫毛发圈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: #faf7f2;
+            background-image: radial-gradient(circle at 20% 10%, #fdf3e4 0%, #f9f3eb 100%);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .app {
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255, 252, 248, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 36px;
+            box-shadow: 0 25px 50px -10px rgba(120, 80, 50, 0.15), 0 0 0 1px rgba(210, 180, 140, 0.3);
+            padding: 24px 20px 30px;
+        }
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 600;
+            color: #4b3825;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            color: #8b7355;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            padding-left: 8px;
+            border-left: 4px solid #c49a6c;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 12px;
+            box-shadow: 0 8px 20px rgba(120, 70, 30, 0.06);
+            border: 1px solid #f0e2d2;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9b8a7c;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #5a3e2b;
+            line-height: 1.2;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            border: none;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 6px 14px rgba(140, 100, 60, 0.12);
+            border: 1px solid #e2cfb6;
+            color: #5e4630;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fffdf9;
+        }
+        .btn-primary {
+            background: #6b4c3b;
+            color: white;
+            border: 1px solid #543e2f;
+            box-shadow: 0 8px 16px rgba(107, 76, 59, 0.25);
+        }
+        .btn-primary:hover { background: #5a3e2f; }
+        .btn:hover { background: #f8efe5; border-color: #c9aa8b; }
+        .search-box {
+            flex: 1;
+            min-width: 180px;
+            background: white;
+            border-radius: 30px;
+            padding: 10px 18px;
+            border: 1px solid #e2cfb6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fffdf9;
+        }
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+            background: transparent;
+            color: #4b3825;
+        }
+        .category-filter {
+            background: white;
+            border-radius: 30px;
+            padding: 8px 16px;
+            border: 1px solid #e2cfb6;
+            font-size: 0.9rem;
+            color: #4b3825;
+            background: #fffdf9;
+            cursor: pointer;
+        }
+        .table-wrapper {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: 0 10px 25px rgba(120, 70, 20, 0.05);
+            border: 1px solid #f0e1d0;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+            white-space: nowrap;
+            font-size: 0.85rem;
+        }
+        th {
+            background: #f7efe5;
+            color: #4f3b2a;
+            font-weight: 700;
+            padding: 14px 10px;
+            text-align: left;
+            border-bottom: 2px solid #d9c2a6;
+            font-size: 0.8rem;
+            letter-spacing: 0.4px;
+        }
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f2e5d6;
+            color: #4a3929;
+            vertical-align: middle;
+        }
+        tbody tr:hover { background: #fefaf4; }
+        .stock-cell { font-weight: 700; color: #3e2f20; }
+        .price-cell { font-weight: 500; color: #73553b; }
+        .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+        .icon-btn {
+            background: #f9f3ea;
+            border: 1px solid #e2cfb6;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #5e402b;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: white;
+        }
+        .icon-btn:hover { background: #f3e4d4; border-color: #b49268; }
+        .icon-btn.danger { color: #b34a4a; border-color: #e6c5c0; }
+        .icon-btn.danger:hover { background: #fce8e6; }
+        .editable-input {
+            width: 85px;
+            padding: 6px 8px;
+            border: 1px solid #e0cfb8;
+            border-radius: 12px;
+            text-align: center;
+            background: #fffdf8;
+            font-size: 0.85rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 24px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 30px 50px rgba(80, 40, 20, 0.25);
+            animation: fadeSlide 0.2s ease;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0.6; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal h3 { color: #4b3825; margin-bottom: 18px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block; font-weight: 600; font-size: 0.8rem;
+            color: #6b5b4b; margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px 14px; border: 1px solid #ddceba;
+            border-radius: 16px; font-size: 0.95rem; background: #fefcf8;
+        }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <h1>🧺 地摊库存本</h1>
+    <div class="subtitle">假睫毛 · 发圈 · 镊子 — 可编辑单价·增删商品·成本自动计算</div>
+
+    <div class="stats-grid" id="statsContainer"></div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索名称..." oninput="renderTable()">
+        </div>
+        <select class="category-filter" id="categoryFilter" onchange="renderTable()">
+            <option value="全部">📦 全部</option>
+            <option value="假睫毛">👁️ 假睫毛</option>
+            <option value="发圈">🎀 发圈</option>
+            <option value="工具">🔧 工具</option>
+        </select>
+        <button class="btn" onclick="openAddModal()">➕ 添加商品</button>
+        <button class="btn" onclick="downloadExcel()">📥 导出Excel</button>
+    </div>
+
+    <div class="table-wrapper" id="tableContainer"></div>
+    <div style="color:#a28e7a; font-size:0.8rem; margin-top:8px; text-align:right;">
+        💡 成本单价可直接修改 · 库存/售价也支持编辑 · 数据自动保存
+    </div>
+</div>
+
+<div class="modal" id="productModal">
+    <div class="modal-content">
+        <h3 id="modalTitle">✨ 添加新商品</h3>
+        <input type="hidden" id="editId" value="">
+        <div class="form-group"><label>类别</label><select id="prodCategory"><option value="假睫毛">假睫毛</option><option value="发圈">发圈</option><option value="工具">工具</option></select></div>
+        <div class="form-group"><label>商品名称</label><input type="text" id="prodName" placeholder="例如：懒人三部曲"></div>
+        <div class="form-group"><label>规格/颜色</label><input type="text" id="prodSpec" placeholder="10排/免胶"></div>
+        <div class="form-group"><label>进货单价 (¥)</label><input type="number" id="prodCost" step="0.01" value="0.00"></div>
+        <div class="form-group"><label>初始库存</label><input type="number" id="prodQty" value="1" min="0"></div>
+        <div class="form-group"><label>零售价 (¥)</label><input type="number" id="prodRetail" step="0.01" placeholder="可选"></div>
+        <div class="form-group"><label>备注</label><input type="text" id="prodNote" placeholder="可选"></div>
+        <div class="form-actions">
+            <button class="btn" onclick="closeModal()">取消</button>
+            <button class="btn btn-primary" onclick="saveProduct()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const DEFAULT_DATA = [
+            { id:1, category:"假睫毛", name:"新中式下睫毛", spec:"10排/5-6mm", unitCost:25.75, quantity:6, retailPrice:null, sold:0, salesAmount:0, note:"整单实付" },
+            { id:2, category:"假睫毛", name:"双尖太阳花（胶水）", spec:"10排/胶水", unitCost:2.89, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:3, category:"假睫毛", name:"浓密九尾兔（胶水）", spec:"10排/胶水", unitCost:3.19, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:4, category:"假睫毛", name:"娥（胶水）", spec:"10排/胶水", unitCost:3.18, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:5, category:"假睫毛", name:"犬系汪汪狗（胶水）", spec:"10排/胶水", unitCost:3.33, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:6, category:"假睫毛", name:"云朵小恶魔", spec:"10排/免胶", unitCost:4.28, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:7, category:"假睫毛", name:"犬系汪汪狗（免胶）", spec:"10排/免胶", unitCost:4.08, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:8, category:"假睫毛", name:"娥（免胶）", spec:"10排/免胶", unitCost:4.28, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:9, category:"假睫毛", name:"富家千金", spec:"10排/免胶", unitCost:3.88, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:10, category:"假睫毛", name:"自然猫精灵", spec:"10排/免胶", unitCost:3.88, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:11, category:"假睫毛", name:"懒人三部曲", spec:"10排/免胶", unitCost:3.78, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:12, category:"假睫毛", name:"山茶花", spec:"10排/免胶", unitCost:4.18, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:13, category:"假睫毛", name:"向日葵", spec:"10排/免胶", unitCost:4.08, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:14, category:"假睫毛", name:"自然秋枫叶", spec:"10排/免胶", unitCost:4.08, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:15, category:"假睫毛", name:"猫爪下睫毛", spec:"10排/免胶", unitCost:4.08, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:16, category:"假睫毛", name:"狐系苏妲己", spec:"10排/免胶", unitCost:3.88, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:17, category:"假睫毛", name:"芭比小野兔", spec:"10排/免胶", unitCost:4.28, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:18, category:"假睫毛", name:"太阳花", spec:"10排/免胶", unitCost:3.78, quantity:3, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:19, category:"假睫毛", name:"双尖太阳花（免胶）", spec:"10排/免胶", unitCost:4.08, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:20, category:"假睫毛", name:"女团ace", spec:"10排/免胶", unitCost:3.78, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:21, category:"假睫毛", name:"浓密九尾兔（免胶）", spec:"10排/免胶", unitCost:4.28, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:22, category:"工具", name:"不粘胶镊子", spec:"黑色喷漆", unitCost:12.66, quantity:19, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:23, category:"发圈", name:"藏蓝格纹爱心蕾丝", spec:"约15cm", unitCost:4.09, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:24, category:"发圈", name:"黑白格纹拼接蕾丝", spec:"四层15cm", unitCost:2.23, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:25, category:"发圈", name:"米色缎面波点", spec:"四层15cm", unitCost:3.04, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:26, category:"发圈", name:"大蕾丝花边米色波点", spec:"四层16cm", unitCost:1.99, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:27, category:"发圈", name:"粉色KT蝴蝶结", spec:"/", unitCost:3.73, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:28, category:"发圈", name:"冰蓝肌理泡泡纱", spec:"4层14cm", unitCost:2.76, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:29, category:"发圈", name:"粉白蝴蝶结", spec:"双层15cm", unitCost:2.35, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:30, category:"发圈", name:"双层蓝花边", spec:"/", unitCost:2.16, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:31, category:"发圈", name:"黄色碎花双层", spec:"双层", unitCost:2.70, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:32, category:"发圈", name:"黑色缎面波点", spec:"四层15cm", unitCost:2.75, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:33, category:"发圈", name:"伊甸园嫩黄碎花蕾丝", spec:"约14cm", unitCost:2.76, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:34, category:"发圈", name:"蓝色条纹云朵棉", spec:"四层18cm", unitCost:3.04, quantity:1, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:35, category:"发圈", name:"新款藏蓝爱心", spec:"/", unitCost:2.43, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:36, category:"发圈", name:"温柔奶芙波点双层", spec:"双层", unitCost:3.86, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" },
+            { id:37, category:"发圈", name:"粉双层发圈", spec:"15cm", unitCost:2.35, quantity:2, retailPrice:null, sold:0, salesAmount:0, note:"" }
+        ];
+
+        let products = [];
+        let nextId = 100;
+
+        function loadData() {
+            const stored = localStorage.getItem('stall_inventory_final');
+            if (stored) {
+                try {
+                    products = JSON.parse(stored);
+                    if (products.length > 0) nextId = Math.max(...products.map(p => p.id)) + 1;
+                } catch (e) { resetToDefault(); }
+            } else {
+                resetToDefault();
+            }
+        }
+
+        function resetToDefault() {
+            products = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            nextId = 100;
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('stall_inventory_final', JSON.stringify(products));
+            updateStats();
+        }
+
+        function updateStats() {
+            const totalItems = products.length;
+            const totalStock = products.reduce((sum, p) => sum + p.quantity, 0);
+            const totalCost = products.reduce((sum, p) => sum + (p.unitCost * (p.quantity + p.sold)), 0);
+            const totalSold = products.reduce((sum, p) => sum + p.sold, 0);
+            const totalSales = products.reduce((sum, p) => sum + (p.salesAmount || 0), 0);
+            const totalProfit = products.reduce((sum, p) => {
+                if (p.retailPrice && p.sold > 0) return sum + (p.sold * p.retailPrice - p.sold * p.unitCost);
+                return sum;
+            }, 0);
+
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stat-card"><span class="stat-label">📦 商品种类</span><span class="stat-value">${totalItems}</span></div>
+                <div class="stat-card"><span class="stat-label">📊 当前库存</span><span class="stat-value">${totalStock}</span></div>
+                <div class="stat-card"><span class="stat-label">💰 进货总成本</span><span class="stat-value">¥${totalCost.toFixed(2)}</span></div>
+                <div class="stat-card"><span class="stat-label">🛒 已售数量</span><span class="stat-value">${totalSold}</span></div>
+                <div class="stat-card"><span class="stat-label">💵 销售额</span><span class="stat-value">¥${totalSales.toFixed(2)}</span></div>
+                <div class="stat-card"><span class="stat-label">📈 预估利润</span><span class="stat-value">¥${totalProfit.toFixed(2)}</span></div>
+            `;
+        }
+
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            let filtered = products.filter(p => {
+                const matchCat = categoryFilter === '全部' || p.category === categoryFilter;
+                const matchSearch = p.name.toLowerCase().includes(searchTerm) || (p.note && p.note.toLowerCase().includes(searchTerm));
+                return matchCat && matchSearch;
+            });
+
+            let html = `<table><thead><tr>
+                <th>类别</th><th>名称</th><th>规格</th><th>进货单价</th><th>库存</th><th>已售</th><th>零售价</th><th>销售额</th><th>操作</th>
+            </tr></thead><tbody>`;
+
+            if (filtered.length === 0) {
+                html += `<tr><td colspan="9" style="text-align:center; padding:30px; color:#b7a089;">暂无商品，点击"添加商品"开始 ✨</td></tr>`;
+            } else {
+                filtered.forEach(p => {
+                    html += `<tr>
+                        <td>${p.category}</td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.spec || '-'}</td>
+                        <td><input type="number" class="editable-input" value="${p.unitCost.toFixed(2)}" step="0.01" onchange="updateUnitCost(${p.id}, this.value)"></td>
+                        <td class="stock-cell">${p.quantity}</td>
+                        <td>${p.sold}</td>
+                        <td><input type="number" class="editable-input" value="${p.retailPrice || ''}" step="0.01" placeholder="售价" onchange="updateRetailPrice(${p.id}, this.value)"></td>
+                        <td>¥${(p.salesAmount || 0).toFixed(2)}</td>
+                        <td class="action-btns">
+                            <button class="icon-btn" onclick="stockIn(${p.id})">📥 +1</button>
+                            <button class="icon-btn" onclick="stockOut(${p.id})">📤 -1</button>
+                            <button class="icon-btn" onclick="editProduct(${p.id})">✏️</button>
+                            <button class="icon-btn danger" onclick="deleteProduct(${p.id})">🗑️</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            html += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = html;
+            updateStats();
+        }
+
+        window.updateUnitCost = function(id, value) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                const val = parseFloat(value);
+                if (!isNaN(val) && val >= 0) {
+                    product.unitCost = val;
+                    saveData();
+                    renderTable();
+                }
+            }
+        };
+
+        window.updateRetailPrice = function(id, value) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                const val = parseFloat(value);
+                product.retailPrice = isNaN(val) ? null : val;
+                saveData();
+                renderTable();
+            }
+        };
+
+        window.stockIn = function(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                product.quantity += 1;
+                saveData();
+                renderTable();
+            }
+        };
+
+        window.stockOut = function(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            if (product.quantity <= 0) { alert('库存不足'); return; }
+            let price = product.retailPrice;
+            if (!price) {
+                const input = prompt(`请输入"${product.name}"的实际售价 (¥)：`, '');
+                if (input === null) return;
+                price = parseFloat(input);
+                if (isNaN(price) || price < 0) { alert('请输入有效价格'); return; }
+                product.retailPrice = price;
+            }
+            product.quantity -= 1;
+            product.sold += 1;
+            product.salesAmount = (product.salesAmount || 0) + price;
+            saveData();
+            renderTable();
+        };
+
+        window.deleteProduct = function(id) {
+            if (confirm('确定删除这个商品吗？')) {
+                products = products.filter(p => p.id !== id);
+                saveData();
+                renderTable();
+            }
+        };
+
+        window.editProduct = function(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            document.getElementById('modalTitle').textContent = '✏️ 编辑商品';
+            document.getElementById('editId').value = id;
+            document.getElementById('prodCategory').value = product.category;
+            document.getElementById('prodName').value = product.name;
+            document.getElementById('prodSpec').value = product.spec || '';
+            document.getElementById('prodCost').value = product.unitCost;
+            document.getElementById('prodQty').value = product.quantity;
+            document.getElementById('prodRetail').value = product.retailPrice || '';
+            document.getElementById('prodNote').value = product.note || '';
+            document.getElementById('productModal').classList.add('active');
+        };
+
+        window.openAddModal = function() {
+            document.getElementById('modalTitle').textContent = '✨ 添加新商品';
+            document.getElementById('editId').value = '';
+            document.getElementById('prodCategory').value = '假睫毛';
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodSpec').value = '';
+            document.getElementById('prodCost').value = '0.00';
+            document.getElementById('prodQty').value = '1';
+            document.getElementById('prodRetail').value = '';
+            document.getElementById('prodNote').value = '';
+            document.getElementById('productModal').classList.add('active');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('productModal').classList.remove('active');
+        };
+
+        window.saveProduct = function() {
+            const id = document.getElementById('editId').value;
+            const category = document.getElementById('prodCategory').value;
+            const name = document.getElementById('prodName').value.trim();
+            const spec = document.getElementById('prodSpec').value.trim();
+            const unitCost = parseFloat(document.getElementById('prodCost').value);
+            const quantity = parseInt(document.getElementById('prodQty').value) || 0;
+            const retailPriceRaw = document.getElementById('prodRetail').value;
+            const retailPrice = retailPriceRaw ? parseFloat(retailPriceRaw) : null;
+            const note = document.getElementById('prodNote').value.trim();
+
+            if (!name) { alert('请输入商品名称'); return; }
+            if (isNaN(unitCost)) { alert('请输入有效成本'); return; }
+
+            if (id) {
+                const product = products.find(p => p.id === parseInt(id));
+                if (product) {
+                    product.category = category;
+                    product.name = name;
+                    product.spec = spec;
+                    product.unitCost = unitCost;
+                    product.quantity = quantity;
+                    product.retailPrice = retailPrice;
+                    product.note = note;
+                }
+            } else {
+                products.push({
+                    id: nextId++,
+                    category, name, spec, unitCost, quantity,
+                    retailPrice, sold: 0, salesAmount: 0, note
+                });
+            }
+            saveData();
+            renderTable();
+            closeModal();
+        };
+
+        window.downloadExcel = function() {
+            const table = document.getElementById('tableContainer').querySelector('table');
+            if (!table) return;
+            const clonedTable = table.cloneNode(true);
+            clonedTable.querySelectorAll('input.editable-input').forEach(input => {
+                const span = document.createElement('span');
+                span.textContent = input.value || '—';
+                input.parentNode.replaceChild(span, input);
+            });
+            const styles = document.querySelector('style').innerHTML;
+            const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><style>${styles}</style></head><body>${clonedTable.outerHTML}</body></html>`;
+            const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `地摊库存_${new Date().toISOString().slice(0,10)}.xls`;
+            a.click();
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            renderTable();
+            document.getElementById('productModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+        });
+    })();
+</script>
+</body>
+</html>
